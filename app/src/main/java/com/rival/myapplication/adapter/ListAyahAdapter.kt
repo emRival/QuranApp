@@ -9,8 +9,18 @@ import com.rival.myapplication.databinding.ItemAyahBinding
 
 class ListAyahAdapter : RecyclerView.Adapter<ListAyahAdapter.AyahViewHolder>() {
 
-    val listAyah = ArrayList<AyahsItem>()
-    val listQuranEdition = ArrayList<QuranEditionItem>()
+    interface OnItemClickCallback {
+        fun onItemClicked(data: AyahsItem)
+    }
+
+    private val listAyah = ArrayList<AyahsItem>()
+    private val listQuranEdition = ArrayList<QuranEditionItem>()
+    private var onItemClickCallback: OnItemClickCallback? = null
+
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
+        this.onItemClickCallback = onItemClickCallback
+    }
+
 
     fun setData(dataAyah: List<AyahsItem>, dataEdition: List<QuranEditionItem>) {
         if (dataAyah == null || dataEdition == null) return
@@ -34,13 +44,19 @@ class ListAyahAdapter : RecyclerView.Adapter<ListAyahAdapter.AyahViewHolder>() {
 
     override fun onBindViewHolder(holder: AyahViewHolder, position: Int) {
         val listAyah = listAyah[position]
-        val quranAudio = listQuranEdition[1]
-        val quranTranslateIndo = listQuranEdition[2]
+        val quranAudio = listQuranEdition[1].listAyahs[position]
+        val quranTranslateIndo = listQuranEdition[2].listAyahs[position]
 
         holder.binding.apply {
             itemNumberAyah.text = listAyah.numberInSurah.toString()
             itemAyah.text = listAyah.text
-            itemTranslation.text = quranTranslateIndo.listAyahs.get(position).text
+            itemTranslation.text = quranTranslateIndo.text
+
+            this.root.setOnClickListener {
+                quranAudio.let { data ->
+                    onItemClickCallback?.onItemClicked(data)
+                }
+            }
         }
     }
 }
